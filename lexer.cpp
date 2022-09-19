@@ -47,6 +47,7 @@ void lexer::identifierDFA(int &pointer)
         state = ((isLetter(stream[pointer]) || stream[pointer] == '_') && state == 0) ? 1 : -1;
         
         // If Space is Encountered at State 1 Transition to State 2 else Stay on the same State
+        // Note : handle cases of special characters appearing instead of Space !
         state = (stream[pointer] == ' ' && state == 1) ? 2 : state;
         
         switch (state)
