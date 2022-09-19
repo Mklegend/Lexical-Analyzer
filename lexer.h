@@ -58,7 +58,7 @@ public:
 	bool isLetter(char);
 
 	// Functions for DFAs
-	void identifierDFA(int); // Checks for Identifier Given the Position of the Pointer
+	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer
 };
 
 #endif // !_LEXER_H

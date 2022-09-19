@@ -33,7 +33,7 @@ bool lexer::isLetter(char ch)
 {
     return ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) ? true : false;
 }
-void lexer::identifierDFA(int pointer)
+void lexer::identifierDFA(int &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
