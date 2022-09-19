@@ -39,6 +39,7 @@ void lexer::identifierDFA(int pointer)
     int state = 0;
     bool terminated = false;
     token token_;
+    token_.tokenType = TokenType::Identifier;
     while (!terminated)
     {   
         // If Reads Letter or UnderScore at State 0 transition to State 1
@@ -50,6 +51,7 @@ void lexer::identifierDFA(int pointer)
         
         switch (state)
         {
+        // Identifier doesn't exist
         case -1:
             break;
         // Simulating Self Loop over State 1 for Reading any number of Characters until Space is encountered 
@@ -58,8 +60,8 @@ void lexer::identifierDFA(int pointer)
             pointer = pointer+1;
 
         case 2:
-            // Add code for updating the Token Vector
-            
+            // Updating the Token Vector with new Token !
+            tokens.push_back(token_);
             break;
         }
     }
