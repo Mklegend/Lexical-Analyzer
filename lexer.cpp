@@ -100,40 +100,67 @@ void lexer::keywordDFA(int &pointer)
             {
             case "function":
                 token_.tokenType = TokenType::Function;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "if":
                 token_.tokenType = TokenType::If;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "else":
                 token_.tokenType = TokenType::Else;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "do":
                 token_.tokenType = TokenType::Do;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "until":
                 token_.tokenType = TokenType::Until;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "then":
                 token_.tokenType = TokenType::Then;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "read":
                 token_.tokenType = TokenType::Read;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "display":
                 token_.tokenType = TokenType::Display;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "displayline":
                 token_.tokenType = TokenType::DisplayLine;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case "return":
                 token_.tokenType = TokenType::Return;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
                 break;
             case default:
                 break;
             }
-            token_.lexeme = "null";
-            // Updating the Tokens Vector with new Token !
-            tokens.push_back(token_);
             terminated = true;
             break;
         }
@@ -169,6 +196,69 @@ void lexer::relationalOperatorDFA()
             break;
         case default:
             break;
+        }
+    }
+}
+
+void lexer::specialCharacterDFA(int &pointer)
+{
+    // Set Up DFA Simulation
+    int state = 0;
+    bool terminated = false;
+    token token_;
+    state = (isSpecialCharacter(stream[pointer])) ? 1 : -1;
+    token_.lexeme += stream[pointer];
+    pointer += 1;
+    while (!terminated)
+    {
+        switch (state)
+        {
+        case -1:
+            terminated = true;
+            break;
+        case 1:
+            // Add Logic to Add Special Character Token
+            switch (token_.lexeme)
+            {
+            case ",":
+                token_.tokenType = TokenType::Comma;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
+                break;
+            case ":":
+                token_.tokenType = TokenType::Collon;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
+                break;
+            case ";":
+                token_.tokenType = TokenType::SemiCollan;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
+                break;
+            case "$":
+                token_.tokenType = TokenType::Dollar;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
+                break;
+            case "(":
+                token_.tokenType = TokenType::OpenParenthesis;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
+                break;
+            case ")":
+                token_.tokenType = TokenType::CloseParenthesis;
+                token_.lexeme = "null";
+                // Updating the Tokens Vector with new Token !
+                tokens.push_back(token_);
+                break;
+            case default:
+                break;
+            }
         }
     }
 }

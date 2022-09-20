@@ -34,7 +34,13 @@ enum class TokenType
 	Read,
 	Display,
 	DisplayLine,
-	Return
+	Return,
+	Comma,
+	Collon,
+	SemiCollan,
+	Dollar,
+	OpenParenthesis,
+	CloseParenthesis
 };
 //structure of a token 
 struct token
@@ -73,6 +79,7 @@ public:
 	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer
 	void keywordDFA(int&); // Checks for Keyword Given the Position of the Pointer
 	void relationalOperatorDFA(int&); // Checks for Relational Operator Given the Position of the Pointer
+	void specialCharacterDFA(int&);
 };
 
 #endif // !_LEXER_H
