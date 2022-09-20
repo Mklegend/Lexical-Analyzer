@@ -40,7 +40,12 @@ enum class TokenType
 	SemiCollan,
 	Dollar,
 	OpenParenthesis,
-	CloseParenthesis
+	CloseParenthesis,
+	Plus,
+	Minus,
+	Multiply,
+	Divide,
+	Modulus
 };
 //structure of a token 
 struct token
@@ -73,13 +78,16 @@ public:
 	// Helper Functions
 	bool isLetter(char);
 	bool isSpecialCharacter(char);
-
+	bool isArithematicOperator(char);
 
 	// Functions for DFAs
 	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer
 	void keywordDFA(int&); // Checks for Keyword Given the Position of the Pointer
 	void relationalOperatorDFA(int&); // Checks for Relational Operator Given the Position of the Pointer
-	void specialCharacterDFA(int&);
+	void specialCharacterDFA(int&); 
+	void arithematicOperatorDFA(int&); // Checks for Arithematic Operator Given the Position of the Pointer
+
+
 };
 
 #endif // !_LEXER_H

@@ -33,10 +33,14 @@ bool lexer::isLetter(char ch)
 {
     return ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) ? true : false;
 }
-bool lexer::isSpecialCharacter(char)
+bool lexer::isSpecialCharacter(char ch)
 {
     return (ch == ':' || ch == ';' || ch == ',' || ch == '$' || ch == '(' || ch == ')') ? true : false;
 }
+bool lexer::isArithematicOperator(char ch){
+    return (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%') ? true : false;
+}
+
 void lexer::identifierDFA(int &pointer)
 {
     // Set Up DFA Simulation
@@ -195,6 +199,7 @@ void lexer::relationalOperatorDFA()
             terminated = true;
             break;
         case default:
+            terminated = true;
             break;
         }
     }
@@ -256,12 +261,64 @@ void lexer::specialCharacterDFA(int &pointer)
                 // Updating the Tokens Vector with new Token !
                 tokens.push_back(token_);
                 break;
-            case default:
-                break;
             }
+        case default:
+            terminated = true;
+            break;
         }
     }
 }
+
+void lexer::arithematicOperatorDFA(int &pointer){
+    // Set Up DFA Simulation
+    int state = 0;
+    bool terminated = false;
+    token token_;
+
+    state = (isArithematicOperator(stream[pointer])) ? 1 : -1;
+    token_.lexeme += stream[pointer];
+    pointer += 1;
+
+    while(!terminated){
+        switch(state){
+            case -1:
+                terminated = true;
+                break;
+            case 1:
+                switch(token_.lexeme){
+                    case "+":
+                        token_.tokenType = TokenType::Plus;
+                        token_.lexeme = "null";
+                        tokens.push_back(token_);
+                        break;
+                    case "-":
+                        token_.tokenType = TokenType::Minus;
+                        token_.lexeme = "null";
+                        tokens.push_back(token_);
+                        break;
+                    case "*":
+                        token_.tokenType = TokenType::Multiply;
+                        token_.lexeme = "null";
+                        tokens.push_back(token_);
+                        break;
+                    case "/":
+                        token_.tokenType = TokenType::Divide;
+                        token_.lexeme = "null";
+                        tokens.push_back(token_);
+                        break;
+                    case "%":
+                        token_.tokenType = TokenType::Modulus;
+                        token_.lexeme = "null";
+                        tokens.push_back(token_);
+                        break;
+                }
+            case default:
+                terminated = true;
+                break;
+        }
+    }
+} 
+
 
 void lexer::Tokenize() // function that tokenizes your input stream
 {
