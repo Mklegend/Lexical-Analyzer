@@ -44,12 +44,11 @@ void lexer::identifierDFA(int &pointer)
     bool terminated = false;
     token token_;
     token_.tokenType = TokenType::Identifier;
+    // If Reads Letter or UnderScore at State 0 transition to State 1
+    // Else Transition to State -1 Which is a Discarded State
+    state = ((isLetter(stream[pointer]) || stream[pointer] == '_') && state == 0) ? 1 : -1;
     while (!terminated)
     {
-        // If Reads Letter or UnderScore at State 0 transition to State 1
-        // Else Transition to State -1 Which is a Discarded State
-        state = ((isLetter(stream[pointer]) || stream[pointer] == '_') && state == 0) ? 1 : -1;
-
         // If Space is Encountered at State 1 Transition to State 2 else Stay on the same State
         // Note : handle cases of special characters appearing instead of Space !
         state = ((stream[pointer] == ' ' || isSpecialCharacter(stream[pointer])) && state == 1) ? 2 : state;
@@ -63,15 +62,81 @@ void lexer::identifierDFA(int &pointer)
         // Simulating Self Loop over State 1 for Reading any number of Characters until Space is encountered
         case 1:
             token_.lexeme += stream[pointer];
-            pointer = pointer + 1;
+            pointer += 1;
         case 2:
-            // Updating the Token Vector with new Token !
+            // Updating the Tokens Vector with new Token !
             tokens.push_back(token_);
             terminated = true;
             break;
         }
     }
 }
+
+void lexer::keywordDFA(int &pointer)
+{
+    // Set Up DFA Simulation
+    int state = 0;
+    bool terminated = false;
+    token token_;
+    state = (isLetter(stream[pointer])) ? 1 : -1;
+    while (!terminated)
+    {
+        // If Space or Special Character is Encountered at State 1 Transition to State 2 else Stay on the same State
+        // Note : handle cases of special characters appearing instead of Space !
+        state = ((stream[pointer] == ' ' || isSpecialCharacter(stream[pointer])) && state == 1) ? 2 : state;
+
+        switch (state)
+        {
+        case -1:
+            terminated = true;
+            break;
+        case 1:
+            token_.lexeme += stream[pointer];
+            pointer += 1;
+        case 2:
+            // Add Logic for Detecting Keywords !
+            // Currently Handling All Tokens Except for 'else if'
+            switch(token_.lexeme){
+                case "function":
+                    token_.tokenType = TokenType::Function;
+                    break;
+                case "if":
+                    token_.tokenType = TokenType::If;
+                    break;
+                case "else":
+                    token_.tokenType = TokenType::Else;
+                    break;
+                case "do":
+                    token_.tokenType = TokenType::Do;
+                    break;
+                case "until":
+                    token_.tokenType = TokenType::Until;
+                    break;
+                case "then":
+                    token_.tokenType = TokenType::Then;
+                    break;
+                case "read":
+                    token_.tokenType = TokenType::Read;
+                    break;
+                case "display":
+                    token_.tokenType = TokenType::Display;
+                    break;
+                case "displayline":
+                    token_.tokenType = TokenType::DisplayLine;
+                    break;
+                case "return":
+                    token_.tokenType = TokenType::Return;
+                    break;
+            }
+            token_.lexeme = "null";
+            // Updating the Tokens Vector with new Token !
+            tokens.push_back(token_);
+            terminated = true;
+            break;
+        }
+    }
+}
+
 void lexer::Tokenize() // function that tokenizes your input stream
 {
     vector<char>::iterator it = stream.begin();

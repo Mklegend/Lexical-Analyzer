@@ -24,7 +24,17 @@ enum class TokenType
 	BlockStart,
 	BlockEnd,
 	SpecialCharacter,
-	Keyword
+	Function,
+	If,
+	Else,
+	Int,
+	Do,
+	Until,
+	Then,
+	Read,
+	Display,
+	DisplayLine,
+	Return
 };
 //structure of a token 
 struct token
@@ -58,8 +68,10 @@ public:
 	bool isLetter(char);
 	bool isSpecialCharacter(char);
 
+
 	// Functions for DFAs
 	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer
+	void keywordDFA(int&); // Checks for Keyword Given the Position of the Pointer
 };
 
 #endif // !_LEXER_H
