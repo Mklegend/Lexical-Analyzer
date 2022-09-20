@@ -10,5 +10,6 @@ int main(char*args[],char *argv[]){
 
     printf("%d",isLetter('A'));
     printf("%d",isLetter('$'));
+    printf("%c","\\'");
     return 0;
 }

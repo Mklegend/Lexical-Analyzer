@@ -86,8 +86,12 @@ public:
 	void relationalOperatorDFA(int&); // Checks for Relational Operator Given the Position of the Pointer
 	void specialCharacterDFA(int&); 
 	void arithematicOperatorDFA(int&); // Checks for Arithematic Operator Given the Position of the Pointer
-
-
+	void variableDFA(int&);
+	void commentDFA(int&);
+	void stringDFA(int&);
+	void assignmentOperator(int&);
+	void startingBlockDFA(int&);
+	void closingBlockDFA(int&);
 };
 
 #endif // !_LEXER_H
