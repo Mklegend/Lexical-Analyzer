@@ -96,42 +96,78 @@ void lexer::keywordDFA(int &pointer)
         case 2:
             // Add Logic for Detecting Keywords !
             // Currently Handling All Tokens Except for 'else if'
-            switch(token_.lexeme){
-                case "function":
-                    token_.tokenType = TokenType::Function;
-                    break;
-                case "if":
-                    token_.tokenType = TokenType::If;
-                    break;
-                case "else":
-                    token_.tokenType = TokenType::Else;
-                    break;
-                case "do":
-                    token_.tokenType = TokenType::Do;
-                    break;
-                case "until":
-                    token_.tokenType = TokenType::Until;
-                    break;
-                case "then":
-                    token_.tokenType = TokenType::Then;
-                    break;
-                case "read":
-                    token_.tokenType = TokenType::Read;
-                    break;
-                case "display":
-                    token_.tokenType = TokenType::Display;
-                    break;
-                case "displayline":
-                    token_.tokenType = TokenType::DisplayLine;
-                    break;
-                case "return":
-                    token_.tokenType = TokenType::Return;
-                    break;
+            switch (token_.lexeme)
+            {
+            case "function":
+                token_.tokenType = TokenType::Function;
+                break;
+            case "if":
+                token_.tokenType = TokenType::If;
+                break;
+            case "else":
+                token_.tokenType = TokenType::Else;
+                break;
+            case "do":
+                token_.tokenType = TokenType::Do;
+                break;
+            case "until":
+                token_.tokenType = TokenType::Until;
+                break;
+            case "then":
+                token_.tokenType = TokenType::Then;
+                break;
+            case "read":
+                token_.tokenType = TokenType::Read;
+                break;
+            case "display":
+                token_.tokenType = TokenType::Display;
+                break;
+            case "displayline":
+                token_.tokenType = TokenType::DisplayLine;
+                break;
+            case "return":
+                token_.tokenType = TokenType::Return;
+                break;
+            case default:
+                break;
             }
             token_.lexeme = "null";
             // Updating the Tokens Vector with new Token !
             tokens.push_back(token_);
             terminated = true;
+            break;
+        }
+    }
+}
+
+void lexer::relationalOperatorDFA()
+{
+    // Set Up DFA Simulation
+    int state = 0;
+    bool terminated = false;
+    token token_;
+    token_.tokenType = TokenType::RelationalOperator;
+    state = (stream[pointer] == '-') ? 1 : -1;
+    while (!terminated)
+    {
+        // If Space is Encountered at State 1 Transition to State 2 else Stay on the same State
+        state = ((stream[pointer] == ' ') && state == 1) ? 2 : state;
+
+        switch (state)
+        {
+        case -1:
+            terminated = true;
+            break;
+        case 1:
+            token_.lexeme += stream[pointer];
+            pointer += 1;
+            break;
+        case 2:
+            // Updating the Tokens Vector with new Token !
+            tokens.push_back(token_);
+            terminated = true;
+            break;
+        case default:
             break;
         }
     }

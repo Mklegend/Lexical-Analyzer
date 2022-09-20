@@ -72,6 +72,7 @@ public:
 	// Functions for DFAs
 	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer
 	void keywordDFA(int&); // Checks for Keyword Given the Position of the Pointer
+	void relationalOperatorDFA(int&); // Checks for Relational Operator Given the Position of the Pointer
 };
 
 #endif // !_LEXER_H
