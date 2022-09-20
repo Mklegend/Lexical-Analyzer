@@ -56,6 +56,7 @@ public:
 	
 	// Helper Functions
 	bool isLetter(char);
+	bool isSpecialCharacter(char);
 
 	// Functions for DFAs
 	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer

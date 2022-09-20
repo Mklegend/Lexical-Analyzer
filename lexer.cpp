@@ -33,6 +33,10 @@ bool lexer::isLetter(char ch)
 {
     return ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) ? true : false;
 }
+bool lexer::isSpecialCharacter(char)
+{
+    return (ch == ':' || ch == ';' || ch == ',' || ch == '$' || ch == '(' || ch == ')') ? true : false;
+}
 void lexer::identifierDFA(int &pointer)
 {
     // Set Up DFA Simulation
@@ -41,28 +45,29 @@ void lexer::identifierDFA(int &pointer)
     token token_;
     token_.tokenType = TokenType::Identifier;
     while (!terminated)
-    {   
+    {
         // If Reads Letter or UnderScore at State 0 transition to State 1
         // Else Transition to State -1 Which is a Discarded State
         state = ((isLetter(stream[pointer]) || stream[pointer] == '_') && state == 0) ? 1 : -1;
-        
+
         // If Space is Encountered at State 1 Transition to State 2 else Stay on the same State
         // Note : handle cases of special characters appearing instead of Space !
-        state = (stream[pointer] == ' ' && state == 1) ? 2 : state;
-        
+        state = ((stream[pointer] == ' ' || isSpecialCharacter(stream[pointer])) && state == 1) ? 2 : state;
+
         switch (state)
         {
         // Identifier doesn't exist
         case -1:
+            terminated = true;
             break;
-        // Simulating Self Loop over State 1 for Reading any number of Characters until Space is encountered 
+        // Simulating Self Loop over State 1 for Reading any number of Characters until Space is encountered
         case 1:
             token_.lexeme += stream[pointer];
-            pointer = pointer+1;
-
+            pointer = pointer + 1;
         case 2:
             // Updating the Token Vector with new Token !
             tokens.push_back(token_);
+            terminated = true;
             break;
         }
     }
