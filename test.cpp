@@ -1,6 +1,8 @@
 #include "stdlib.h"
 #include "stdio.h"
+#include <iostream>
 
+using namespace std;
 
 int isLetter(char ch){
     return ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) ? 1 : 0;
@@ -11,5 +13,9 @@ int main(char*args[],char *argv[]){
     printf("%d",isLetter('A'));
     printf("%d",isLetter('$'));
     printf("%c","\\'");
+    printf("%c",'\\"');
+    string name = "moazzam";
+
+
     return 0;
 }
