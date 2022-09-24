@@ -8,44 +8,44 @@
 using namespace std;
 
 //all your tokens goes here
-enum class TokenType
+enum TokenType
 {
 	END_OF_FILE = 0,
-	ERROR,
-	Identifier,
-	Variable,
-	Number,
-	Letter,
-	String,
-	Comment,
-	AssignmentOperator,
-	RelationalOperator,
-	ArithematicOperator,
-	BlockStart,
-	BlockEnd,
-	SpecialCharacter,
-	Function,
-	If,
-	Else,
-	Int,
-	Do,
-	Until,
-	Then,
-	Read,
-	Display,
-	DisplayLine,
-	Return,
-	Comma,
-	Collon,
-	SemiCollan,
-	Dollar,
-	OpenParenthesis,
-	CloseParenthesis,
-	Plus,
-	Minus,
-	Multiply,
-	Divide,
-	Modulus
+	ERROR = 1,
+	Identifier = 2,
+	Variable = 3,
+	Number = 4,
+	Letter = 5,
+	String = 6,
+	Comment = 7,
+	AssignmentOperator = 8,
+	RelationalOperator = 9,
+	ArithematicOperator = 10,
+	BlockStart = 11,
+	BlockEnd = 12,
+	SpecialCharacter = 13,
+	Function = 14,
+	If = 15,
+	Else = 16,
+	Int = 17,
+	Do = 18,
+	Until = 19,
+	Then = 20,
+	Read = 21,
+	Display = 22,
+	DisplayLine = 23,
+	Return = 24,
+	Comma = 25,
+	Collon = 26,
+	SemiCollan = 27,
+	Dollar = 28,
+	OpenParenthesis = 29,
+	CloseParenthesis = 30,
+	Plus = 31,
+	Minus = 32,
+	Multiply = 33,
+	Divide = 34,
+	Modulus = 35,
 };
 //structure of a token 
 struct token
@@ -79,19 +79,24 @@ public:
 	bool isLetter(char);
 	bool isSpecialCharacter(char);
 	bool isArithematicOperator(char);
+	bool isNumber(char);
+	bool isKeyword(string str);
+	bool isRelationalOperator(string str);
 
 	// Functions for DFAs
-	void identifierDFA(int&); // Checks for Identifier Given the Position of the Pointer
-	void keywordDFA(int&); // Checks for Keyword Given the Position of the Pointer
-	void relationalOperatorDFA(int&); // Checks for Relational Operator Given the Position of the Pointer
-	void specialCharacterDFA(int&); 
-	void arithematicOperatorDFA(int&); // Checks for Arithematic Operator Given the Position of the Pointer
-	void variableDFA(int&);
-	void commentDFA(int&);
-	void stringDFA(int&);
-	void assignmentOperator(int&);
-	void startingBlockDFA(int&);
-	void closingBlockDFA(int&);
+	void identifierDFA(vector<char>::iterator &pointer); // Checks for Identifier Given the Position of the Pointer
+	void keywordDFA(vector<char>::iterator &pointer); // Checks for Keyword Given the Position of the Pointer
+	void relationalOperatorDFA(vector<char>::iterator &pointer); // Checks for Relational Operator Given the Position of the Pointer
+	void specialCharacterDFA(vector<char>::iterator &pointer); 
+	void arithematicOperatorDFA(vector<char>::iterator &pointer); // Checks for Arithematic Operator Given the Position of the Pointer
+	void variableDFA(vector<char>::iterator &pointer);
+	void commentDFA(vector<char>::iterator &pointer);
+	void stringDFASingleQuote(vector<char>::iterator &pointer);
+	void stringDFADoubleQuote(vector<char>::iterator &pointer);
+	void assignmentOperator(vector<char>::iterator &pointer);
+	void startingBlockDFA(vector<char>::iterator &pointer);
+	void closingBlockDFA(vector<char>::iterator &pointer);
+	void numberDFA(vector<char>::iterator &pointer);
 };
 
 #endif // !_LEXER_H

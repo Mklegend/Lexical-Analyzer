@@ -4,11 +4,11 @@ calculateFib: int <- function($n: int){
     $y:int = 0;
     $z:int;
 
-    if (n -lt 0) then {
+    if ($n -lt 0) then {
         displayline:'negative number entered';
         return:0;
-    else if (n -eq 0) then {
-        displayline:"it's 0 man!"
+    else if ($n -eq 0) then {
+        displayline:"it's 10 man!"
         return:0;
     } else {
         display:"\nThe fibonacci series: ";

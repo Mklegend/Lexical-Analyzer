@@ -8,6 +8,7 @@ token::token()
     this->lexeme = "";
     this->tokenType = TokenType::ERROR;
 }
+// Changed Ordering of the Print Method -> (token,lexeme)
 token::token(string lexeme, TokenType tokenType)
 {
     this->lexeme = lexeme;
@@ -15,8 +16,8 @@ token::token(string lexeme, TokenType tokenType)
 }
 void token::Print()
 {
-    cout << "{" << lexeme << " , "
-         << reserved[(int)tokenType] << "}\n";
+    cout << "{" << tokenType << " , "
+         << lexeme << "}\n";
 }
 int lexer::getCurrentPointer()
 {
@@ -41,67 +42,78 @@ bool lexer::isArithematicOperator(char ch)
 {
     return (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%') ? true : false;
 }
+bool lexer::isNumber(char ch){
+    return (ch>='0' && ch<='9') ? true : false;
+}
 
-void lexer::identifierDFA(int &pointer)
+bool lexer::isKeyword(string str){
+    return (str == "function" || str == "if" || str == "else" || str == "int" || str == "then" || str == "do" 
+    || str == "while" || str == "display" || str == "displayline" || str == "read" || str == "return") ? true : false;
+}
+
+bool lexer::isRelationalOperator(string str){
+    return (str == "-lt" || str == "-gt" || str == "-eq" || str == "-le" || str == "-ge") ? true : false; 
+}
+
+// Done
+void lexer::identifierDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
     token_.tokenType = TokenType::Identifier;
-    // If Reads Letter or UnderScore at State 0 transition to State 1
-    // Else Transition to State -1 Which is a Discarded State
-    state = ((isLetter(stream[pointer]) || stream[pointer] == '_') && state == 0) ? 1 : -1;
+   
     while (!terminated)
     {
-        // If Space is Encountered at State 1 Transition to State 2 else Stay on the same State
-        // Note : handle cases of special characters appearing instead of Space !
-        state = ((stream[pointer] == ' ' || isSpecialCharacter(stream[pointer])) && state == 1) ? 2 : state;
+        state = ((isLetter(*pointer) || *pointer == '_')) ? 1 : -1;
+        state = ((*pointer == ':')) ? 2 : state;
 
         switch (state)
         {
         // Identifier doesn't exist
         case -1:
             terminated = true;
+            pointer++;
             break;
-        // Simulating Self Loop over State 1 for Reading any number of Characters until Space is encountered
         case 1:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
+            token_.lexeme += *pointer;
+            pointer++;
+            break;
         case 2:
-            // Updating the Tokens Vector with new Token !
-            tokens.push_back(token_);
+            if(!isKeyword(token_.lexeme)) tokens.push_back(token_);
             terminated = true;
+            pointer++;
             break;
         }
     }
 }
 
-void lexer::keywordDFA(int &pointer)
+// Done
+void lexer::keywordDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
-    state = (isLetter(stream[pointer])) ? 1 : -1;
-    pointer += 1;
+   
     while (!terminated)
     {
-        // If Space or Special Character is Encountered at State 1 Transition to State 2 else Stay on the same State
-        // Note : handle cases of special characters appearing instead of Space !
-        state = ((stream[pointer] == ' ' || isSpecialCharacter(stream[pointer])) && state == 1) ? 2 : state;
+        state = (isLetter(*pointer)) ? 1 : -1;
+        state = ((*pointer == ' ' || isSpecialCharacter(*pointer))) ? 2 : state;
 
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
+            token_.lexeme += *pointer;
+            pointer++;
+            break;
         case 2:
             // Add Logic for Detecting Keywords !
-            // Currently Handling All Tokens Except for 'else if'
             if (token_.lexeme == "function")
             {
                 token_.tokenType = TokenType::Function;
@@ -173,57 +185,61 @@ void lexer::keywordDFA(int &pointer)
                 tokens.push_back(token_);
             }
             terminated = true;
+            pointer++;
             break;
         }
     }
 }
 
-void lexer::relationalOperatorDFA(int &pointer)
+// Done
+void lexer::relationalOperatorDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
     token_.tokenType = TokenType::RelationalOperator;
-    state = (stream[pointer] == '-') ? 1 : -1;
-    pointer += 1;
+    state = (*pointer == '-') ? 1 : -1;
     while (!terminated)
     {
-        // If Space is Encountered at State 1 Transition to State 2 else Stay on the same State
-        state = ((stream[pointer] == ' ') && state == 1) ? 2 : state;
+        state = ((*pointer == ' ') && state == 1) ? 2 : state;
 
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
+            token_.lexeme += *pointer;
+            pointer++;
             break;
         case 2:
             // Updating the Tokens Vector with new Token !
-            tokens.push_back(token_);
+            if(isRelationalOperator(token_.lexeme)) tokens.push_back(token_);
             terminated = true;
+            pointer++;
             break;
         }
     }
 }
-void lexer::specialCharacterDFA(int &pointer)
+
+// Done
+void lexer::specialCharacterDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
-    state = (isSpecialCharacter(stream[pointer])) ? 1 : -1;
-    token_.lexeme += stream[pointer];
-    pointer += 1;
+    state = (isSpecialCharacter(*pointer)) ? 1 : -1;
+    token_.lexeme += *pointer;
     while (!terminated)
     {
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
             if(token_.lexeme == ","){
@@ -258,21 +274,23 @@ void lexer::specialCharacterDFA(int &pointer)
                 tokens.push_back(token_);
             } 
             terminated = true;
+            pointer++;
             break;
         }
     }
 }
 
-void lexer::arithematicOperatorDFA(int &pointer)
+// Done
+void lexer::arithematicOperatorDFA(vector<char>::iterator &pointer)
 {
-    // Set Up DFA Simulation
+     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
 
-    state = (isArithematicOperator(stream[pointer])) ? 1 : -1;
-    token_.lexeme += stream[pointer];
-    pointer += 1;
+    state = (isArithematicOperator(*pointer)) ? 1 : -1;
+    token_.lexeme += *pointer;
+    pointer++;
 
     while (!terminated)
     {
@@ -280,15 +298,16 @@ void lexer::arithematicOperatorDFA(int &pointer)
         {
         case -1:
             terminated = true;
+            // pointer++;
             break;
         case 1:
-            if (token_.lexeme == "+")
+            if (token_.lexeme == "+" && *pointer == ' ') 
             {
                 token_.tokenType = TokenType::Plus;
                 token_.lexeme = "null";
                 tokens.push_back(token_);
             }
-            else if (token_.lexeme == "-")
+            else if (token_.lexeme == "-" &&  *pointer == ' ')
             {
                 token_.tokenType = TokenType::Minus;
                 token_.lexeme = "null";
@@ -314,34 +333,34 @@ void lexer::arithematicOperatorDFA(int &pointer)
             }
             terminated = true;
             break;
-            // case default:
-            //     terminated = true;
-            //     break;
         }
     }
 }
 
-void lexer::variableDFA(int &pointer)
+// Done
+void lexer::variableDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
 
-    state = (stream[pointer] == '$') ? 1 : -1;
-    token_.lexeme += stream[pointer];
-    pointer += 1;
+    state = (*pointer == '$') ? 1 : -1;
+    pointer = (state == 1) ? (pointer+1) : pointer;
+    // token_.lexeme += *pointer;
+    // pointer++;
     while (!terminated)
     {
-        state = (stream[pointer] == ' ' || isSpecialCharacter(stream[pointer])) ? 2 : state;
+        state = ((*pointer == ' ' || isSpecialCharacter(*pointer) || isArithematicOperator(*pointer)) && (state == 1)) ? 2 : state;
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
+            token_.lexeme += *pointer;
+            pointer++;
             break;
         case 2:
             token_.tokenType = TokenType::Variable;
@@ -352,37 +371,40 @@ void lexer::variableDFA(int &pointer)
     }
 }
 
-void lexer::commentDFA(int &pointer)
+// Done
+void lexer::commentDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
 
-    state = (stream[pointer] == '#') ? 1 : -1;
-    pointer += 1;
-    state = (stream[pointer] == '~') ? 2 : -1;
-    pointer += 1;
+    state = (*pointer == '#') ? 1 : -1;
+    pointer++;
 
     while (!terminated)
     {
-        state = (stream[pointer] == '~' && state == 2) ? 3 : state;
-        state = (stream[pointer] == '#' && state == 3) ? 4 : state;
+        state = (*pointer == '~' && state == 2) ? 3 : state;
+        state = (*pointer == '#' && state == 3) ? 4 : state;
 
         switch (state)
         {
         case -1:
             terminated = true;
             break;
+        case 1:
+            state = (*pointer == '~') ? 2 : -1;
+            pointer++;
+            break;
         case 2:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
+            token_.lexeme += *pointer;
+            pointer++;
             break;
         case 3:
-            pointer += 1;
+            pointer++;
             break;
         case 4:
-            pointer += 1;
+            pointer++;
             terminated = true;
             token_.tokenType = TokenType::Comment;
             tokens.push_back(token_);
@@ -391,121 +413,180 @@ void lexer::commentDFA(int &pointer)
     }
 }
 
-void lexer::stringDFA(int &pointer)
+
+void lexer::stringDFASingleQuote(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
 
-    state = (stream[pointer] == 39) ? 1 : -1;
-    state = (stream[pointer] == 34) ? 2 : -1;
-    pointer += 1;
+    state = (*pointer == 39 && (*(pointer-1) == ' ' || *(pointer-1) == ':')) ? 1 : -1;
+    pointer++;
 
     while (!terminated)
     {
-        state = (stream[pointer] == 34 && state == 1) ? 3 : state;
-        state = (stream[pointer] == 39 && state == 2) ? 4 : state;
+        state = (*pointer == 39 && state == 1) ? 2 : state;
+
         switch (state)
         {
         case -1:
             terminated = true;
             break;
         case 1:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
+            token_.lexeme += *pointer;
+            pointer++;
             break;
         case 2:
-            token_.lexeme += stream[pointer];
-            pointer += 1;
-            break;
-        case 3:
-            token_.tokenType = TokenType::String;
-            pointer += 1;
-            tokens.push_back(token_);
+            pointer++;
             terminated = true;
-            break;
-        case 4:
-            token_.tokenType = TokenType::String;
-            pointer += 1;
+            token_.tokenType = TokenType::Comment;
             tokens.push_back(token_);
-            terminated = true;
             break;
         }
     }
 }
 
-void lexer::assignmentOperator(int &pointer)
+void lexer::stringDFADoubleQuote(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
-    state = (stream[pointer] == '=') ? 1 : -1;
+
+    state = (*pointer == 34) ? 1 : -1;
+    pointer++;
+
+
+    while (!terminated)
+    {
+        state = (*pointer == 34 && state == 1) ? 2 : state;
+
+        switch (state)
+        {
+        case -1:
+            terminated = true;
+            break;
+        case 1:
+            token_.lexeme += *pointer;
+            pointer++;
+            break;
+        case 2:
+            pointer++;
+            terminated = true;
+            token_.tokenType = TokenType::Comment;
+            tokens.push_back(token_);
+            break;
+        }
+    }
+}
+
+
+void lexer::assignmentOperator(vector<char>::iterator &pointer)
+{
+    // Set Up DFA Simulation
+    int state = 0;
+    bool terminated = false;
+    token token_;
+    state = (*pointer == '=') ? 1 : -1;
     while (!terminated)
     {
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
             token_.lexeme = "null";
             token_.tokenType = TokenType::AssignmentOperator;
             tokens.push_back(token_);
             terminated = true;
-            pointer += 1;
+            pointer++;
             break;
         }
     }
 }
 
-void lexer::startingBlockDFA(int &pointer)
+void lexer::startingBlockDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
-    state = (stream[pointer] == '{') ? 1 : -1;
+    state = (*pointer == '{') ? 1 : -1;
     while (!terminated)
     {
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
             token_.lexeme = "null";
             token_.tokenType = TokenType::BlockStart;
             tokens.push_back(token_);
             terminated = true;
-            pointer += 1;
+            pointer++;
             break;
         }
     }
 }
 
-void lexer::closingBlockDFA(int &pointer)
+void lexer::closingBlockDFA(vector<char>::iterator &pointer)
 {
     // Set Up DFA Simulation
     int state = 0;
     bool terminated = false;
     token token_;
-    state = (stream[pointer] == '}') ? 1 : -1;
+    state = (*pointer == '}') ? 1 : -1;
     while (!terminated)
     {
         switch (state)
         {
         case -1:
             terminated = true;
+            pointer++;
             break;
         case 1:
             token_.lexeme = "null";
             token_.tokenType = TokenType::BlockEnd;
             tokens.push_back(token_);
             terminated = true;
-            pointer += 1;
+            pointer++;
             break;
+        }
+    }
+}
+
+
+
+void lexer::numberDFA(vector<char>::iterator &pointer){
+    // Set Up DFA Simulation
+    int state = 0;
+    bool terminated = false;
+    token token_;
+
+    state = (isNumber(*pointer)) ? 1 : -1;
+
+    while(!terminated){
+        state = (*pointer == ';' || *pointer == ')' || *pointer == ' ') ? 2 : state;
+        switch(state){
+            case -1:
+                terminated = true;
+                pointer++;
+                break;
+            case 1:
+                token_.lexeme += *pointer;
+                pointer++;
+                break;
+            case 2:
+                token_.tokenType = TokenType::Number;
+                if(token_.lexeme != "" && token_.lexeme != " ") tokens.push_back(token_);
+                pointer++;
+                terminated = true;
+                break;
         }
     }
 }
@@ -514,9 +595,51 @@ void lexer::Tokenize() // function that tokenizes your input stream
 {
     vector<char>::iterator it = stream.begin();
     // your implementation goes here
-    // while(it != stream.end()){
-
-    // }
+    int counter = 0;
+    while(counter<=11){
+    while(it != stream.end()){
+        switch(counter){
+            case 0:
+                keywordDFA(it);
+                break;
+            case 1:
+                variableDFA(it);
+                break;
+            case 2:
+                identifierDFA(it);
+                break;
+            case 3:
+                relationalOperatorDFA(it);
+                break;
+            case 4:
+                specialCharacterDFA(it);
+                break;
+            case 5:
+                arithematicOperatorDFA(it);
+                break;
+            case 6:
+                commentDFA(it);
+                break;
+            case 7:
+                stringDFASingleQuote(it);
+                break;
+            case 8:
+                stringDFADoubleQuote(it);
+                break;
+            case 9:
+                startingBlockDFA(it);
+                break;
+            case 10:
+                closingBlockDFA(it);
+                break;
+            case 11:
+                numberDFA(it);
+                break;
+        }
+    }
+    counter++;
+    it = stream.begin();
+    }
     // push_back EOF token at end to identify End of File
     tokens.push_back(token(string(""), TokenType::END_OF_FILE));
 }

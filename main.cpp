@@ -9,9 +9,11 @@ int main(int argc, char* argv[])
 	{
 		lexer _lexer(argv[1]);
 		// Checking for the stream
-		// _lexer.printRaw();
+		_lexer.printRaw();
 		token t;
 		t = _lexer.getNextToken();
+		cout<<"Printing t : ";
+		t.Print();
 		while (t.tokenType != TokenType::END_OF_FILE)
 		{
 			t.Print();
